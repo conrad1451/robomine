@@ -92,6 +92,16 @@ const ROBOT_UPGRADE_BASE_COST: Record<RobotType, number> = {
 
 const MAX_ROBOT_LEVEL = 10;
 
+// CHQ: Claude AI (Haiku) extracted material prices into its own Record of constants
+const MATERIAL_VALUES: Record<MaterialType, number> = {
+  refined_gold: 100,
+  refined_silver: 80,
+  refined_copper: 60,
+  circuits: 200,
+  batteries: 150,
+  construction_steel: 120,
+};
+
 interface GameStoreState extends GameState {
   addRobot: (type: RobotType, mineName: string) => void;
   assignRobotToMine: (robotId: string, mineName: MineType) => void;
@@ -112,18 +122,17 @@ export function robotUpgradeCost(robot: Robot): number {
   );
 }
 
+// CHQ: Claude AI (Haiku) swapped hard coded values with iterating ove a Record of constants
 export const useGameStore = create<GameStoreState>((set, get) => ({
   balance: 50000,
   robots: [],
   mines: Object.values(MINE_DATA),
-  materials: [
-    { type: "refined_gold", quantity: 0, value: 100 },
-    { type: "refined_silver", quantity: 0, value: 80 },
-    { type: "refined_copper", quantity: 0, value: 60 },
-    { type: "circuits", quantity: 0, value: 200 },
-    { type: "batteries", quantity: 0, value: 150 },
-    { type: "construction_steel", quantity: 0, value: 120 },
-  ],
+  materials: Object.entries(MATERIAL_VALUES).map(([type, value]) => ({
+    type: type as MaterialType,
+    quantity: 0,
+    value,
+  })),
+
   totalMined: 0,
   gameTime: 0,
 
