@@ -83,14 +83,33 @@ const ROBOT_EFFICIENCY: Record<RobotType, number> = {
   elite: 5,
 };
 
+// CHQ: Claude AI (Sonnet): Cost to upgrade a robot to (level + 1), scales with current level and tier.
+const ROBOT_UPGRADE_BASE_COST: Record<RobotType, number> = {
+  basic: 2000,
+  advanced: 6000,
+  elite: 20000,
+};
+
+const MAX_ROBOT_LEVEL = 10;
+
 interface GameStoreState extends GameState {
   addRobot: (type: RobotType, mineName: string) => void;
   assignRobotToMine: (robotId: string, mineName: MineType) => void;
   collectResources: () => void;
-  processResources: (recipe: MaterialType) => void;
+  processResources: (recipeId: MaterialType) => void;
+  sellOre: (mineType: MineType) => void;
+  sellMaterial: (materialType: MaterialType, quantity?: number) => void;
   upgradeMine: (mineName: MineType) => void;
+  upgradeRobot: (robotId: string) => void;
   addBalance: (amount: number) => void;
   deductBalance: (amount: number) => boolean;
+}
+
+// CHQ: Claude AI (Sonnet):
+export function robotUpgradeCost(robot: Robot): number {
+  return Math.round(
+    ROBOT_UPGRADE_BASE_COST[robot.type] * Math.pow(1.6, robot.level - 1),
+  );
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -276,6 +295,31 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       ),
       balance: state.balance - upgradeCost,
     }));
+  },
+
+  // CHQ: Claude AI (Sonnet):
+  upgradeRobot: (robotId: string) => {
+    set((state) => {
+      const robot = state.robots.find((r) => r.id === robotId);
+      if (!robot) return state;
+      if (robot.level >= MAX_ROBOT_LEVEL) return state;
+
+      const cost = robotUpgradeCost(robot);
+      if (state.balance < cost) return state;
+
+      return {
+        balance: state.balance - cost,
+        robots: state.robots.map((r) =>
+          r.id === robotId
+            ? {
+                ...r,
+                level: r.level + 1,
+                efficiency: r.efficiency + ROBOT_EFFICIENCY[r.type] * 0.5,
+              }
+            : r,
+        ),
+      };
+    });
   },
 
   addBalance: (amount: number) => {
