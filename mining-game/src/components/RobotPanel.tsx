@@ -2,9 +2,10 @@
 
 // CHQ: Claude AI (Haiku) generated file
 
-import type { Robot } from "../types";
+import type { Robot, MineType } from "../types";
 
 import { robotUpgradeCost, useGameStore } from "../store/gameStore";
+import { useState } from "react";
 
 const RobotInfoTile = (props: {
   robot: Robot;
@@ -40,9 +41,24 @@ const RobotInfoTile = (props: {
   );
 };
 
-// CHQ: Claude AI (Sonnet): edits made to file
+// CHQ: Claude AI (Sonnet) refactored functional component
 export function RobotPanel() {
   const { robots, balance, upgradeRobot } = useGameStore();
+
+  const ROBOT_MINE_TYPES: MineType[] = [
+    "gold",
+    "silver",
+    "copper",
+    "lithium",
+    "rare_earth",
+  ];
+
+  // null = "show all"; otherwise the selected MineType filter
+  const [selectedType, setSelectedType] = useState<MineType | null>(null);
+
+  const visibleRobots = selectedType
+    ? robots.filter((robot) => robot.mineType === selectedType)
+    : robots;
 
   return (
     <div className="bg-slate-800 rounded-lg p-6 border border-blue-500/30">
@@ -53,22 +69,57 @@ export function RobotPanel() {
           No robots yet. Purchase your first bot to start mining!
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {robots.map((robot) => {
-            const cost = robotUpgradeCost(robot);
-            const maxed = robot.level >= 10;
+        <>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <button
+              onClick={() => setSelectedType(null)}
+              className={`w-full py-2 px-3 rounded text-sm transition ${
+                selectedType === null
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-slate-700 hover:bg-slate-600"
+              } text-white`}
+            >
+              Show All
+            </button>
+            {ROBOT_MINE_TYPES.map((mineType) => (
+              <button
+                key={mineType}
+                onClick={() => setSelectedType(mineType)}
+                className={`w-full py-2 px-3 rounded text-sm transition capitalize ${
+                  selectedType === mineType
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "bg-slate-700 hover:bg-slate-600"
+                } text-white`}
+              >
+                {mineType.replace("_", " ")}
+              </button>
+            ))}
+          </div>
 
-            return (
-              <RobotInfoTile
-                robot={robot}
-                balance={balance}
-                cost={cost}
-                maxed={maxed}
-                upgradeRobot={upgradeRobot}
-              />
-            );
-          })}
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {visibleRobots.map((robot) => {
+              const cost = robotUpgradeCost(robot);
+              const maxed = robot.level >= 10;
+
+              return (
+                <RobotInfoTile
+                  key={robot.id}
+                  robot={robot}
+                  balance={balance}
+                  cost={cost}
+                  maxed={maxed}
+                  upgradeRobot={upgradeRobot}
+                />
+              );
+            })}
+          </div>
+
+          {visibleRobots.length === 0 && (
+            <p className="text-gray-400 mt-2">
+              No robots mining {selectedType?.replace("_", " ")} right now.
+            </p>
+          )}
+        </>
       )}
     </div>
   );
