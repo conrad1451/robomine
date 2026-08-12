@@ -29,7 +29,10 @@ export interface Mine {
   name: string;
   depth: number;
   resourcePerSecond: number;
+  /** Raw ore currently stockpiled at this mine (0..maxCapacity) */
   totalExtracted: number;
+  /** Lifetime total ore ever pulled out of this mine, for stats display */
+  lifetimeExtracted: number;
   robotsAssigned: number;
   maxCapacity: number;
 }

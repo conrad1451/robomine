@@ -11,6 +11,7 @@ import type {
   RobotType,
   MaterialType,
 } from "../types";
+import { ORE_BASE_VALUE, PROCESSING_RECIPES } from "../types";
 
 const MINE_DATA: Record<MineType, Mine> = {
   gold: {
@@ -20,6 +21,7 @@ const MINE_DATA: Record<MineType, Mine> = {
     depth: 100,
     resourcePerSecond: 0.5,
     totalExtracted: 0,
+    lifetimeExtracted: 0,
     robotsAssigned: 0,
     maxCapacity: 1000,
   },
@@ -30,6 +32,7 @@ const MINE_DATA: Record<MineType, Mine> = {
     depth: 80,
     resourcePerSecond: 0.8,
     totalExtracted: 0,
+    lifetimeExtracted: 0,
     robotsAssigned: 0,
     maxCapacity: 1200,
   },
@@ -40,6 +43,7 @@ const MINE_DATA: Record<MineType, Mine> = {
     depth: 120,
     resourcePerSecond: 1.2,
     totalExtracted: 0,
+    lifetimeExtracted: 0,
     robotsAssigned: 0,
     maxCapacity: 1500,
   },
@@ -50,6 +54,7 @@ const MINE_DATA: Record<MineType, Mine> = {
     depth: 200,
     resourcePerSecond: 0.3,
     totalExtracted: 0,
+    lifetimeExtracted: 0,
     robotsAssigned: 0,
     maxCapacity: 500,
   },
@@ -60,6 +65,7 @@ const MINE_DATA: Record<MineType, Mine> = {
     depth: 300,
     resourcePerSecond: 0.1,
     totalExtracted: 0,
+    lifetimeExtracted: 0,
     robotsAssigned: 0,
     maxCapacity: 200,
   },
@@ -138,8 +144,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   collectResources: () => {
     set((state) => {
       let newBalance = state.balance;
-      const newMaterials = [...state.materials];
-      let totalExtracted = state.totalMined;
+      let totalMinedDelta = 0;
+      const gains: Record<string, number> = {};
 
       state.robots.forEach((robot) => {
         if (!robot.isWorking || !robot.assignedMine) return;
@@ -148,41 +154,105 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         if (!mine) return;
 
         const extractAmount = mine.resourcePerSecond * robot.efficiency * 0.1;
-        totalExtracted += extractAmount;
+        totalMinedDelta += extractAmount;
+        gains[mine.type] = (gains[mine.type] ?? 0) + extractAmount;
+      });
 
-        // Convert raw material to value (simplified for demo)
-        const baseValue =
-          robot.mineType === "gold"
-            ? 50
-            : robot.mineType === "silver"
-              ? 40
-              : 30;
-        newBalance += extractAmount * baseValue * robot.efficiency;
+      const newMines = state.mines.map((mine) => {
+        const extracted = gains[mine.type];
+        if (!extracted) return mine;
+
+        const capacityRemaining = mine.maxCapacity - mine.totalExtracted;
+        const stockpiled = Math.min(extracted, Math.max(capacityRemaining, 0));
+        const overflow = extracted - stockpiled;
+
+        // Ore that doesn't fit in the mine's stockpile is auto-sold on the
+        // spot so idle robots still generate some income, but the player
+        // is incentivized to sell/process before hitting capacity.
+        if (overflow > 0) {
+          newBalance += overflow * ORE_BASE_VALUE[mine.type];
+        }
+
+        return {
+          ...mine,
+          totalExtracted: mine.totalExtracted + stockpiled,
+          lifetimeExtracted: mine.lifetimeExtracted + extracted,
+        };
       });
 
       return {
         balance: newBalance,
-        totalMined: totalExtracted,
+        totalMined: state.totalMined + totalMinedDelta,
+        mines: newMines,
+      };
+    });
+  },
+
+  sellOre: (mineType: MineType) => {
+    set((state) => {
+      const mine = state.mines.find((m) => m.type === mineType);
+      if (!mine || mine.totalExtracted <= 0) return state;
+
+      const proceeds = mine.totalExtracted * ORE_BASE_VALUE[mineType];
+
+      return {
+        balance: state.balance + proceeds,
+        mines: state.mines.map((m) =>
+          m.type === mineType ? { ...m, totalExtracted: 0 } : m,
+        ),
+      };
+    });
+  },
+
+  processResources: (recipeId: MaterialType) => {
+    set((state) => {
+      const recipe = PROCESSING_RECIPES.find((r) => r.id === recipeId);
+      if (!recipe) return state;
+
+      if (state.balance < recipe.energyCost) return state;
+
+      const mine = state.mines.find((m) => m.type === recipe.input.type);
+      if (!mine || mine.totalExtracted < recipe.input.quantity) return state;
+
+      const newMines = state.mines.map((m) =>
+        m.type === recipe.input.type
+          ? { ...m, totalExtracted: m.totalExtracted - recipe.input.quantity }
+          : m,
+      );
+
+      const newMaterials = state.materials.map((mat) =>
+        mat.type === recipe.output.type
+          ? { ...mat, quantity: mat.quantity + recipe.output.quantity }
+          : mat,
+      );
+
+      return {
+        balance: state.balance - recipe.energyCost,
+        mines: newMines,
         materials: newMaterials,
       };
     });
   },
 
-  processResources: (recipe: MaterialType) => {
-    // Simplified processing logic
+  // CHQ: Claude AI (Sonnet):
+  sellMaterial: (materialType: MaterialType, quantity?: number) => {
     set((state) => {
-      const energyCost = 500;
-      if (state.balance < energyCost) return state;
+      const material = state.materials.find((m) => m.type === materialType);
+      if (!material || material.quantity <= 0) return state;
 
-      const materialIndex = state.materials.findIndex((m) => m.type === recipe);
-      if (materialIndex === -1) return state;
-
-      const newMaterials = [...state.materials];
-      newMaterials[materialIndex].quantity += 10;
+      const sellQty = Math.min(
+        quantity ?? material.quantity,
+        material.quantity,
+      );
+      if (sellQty <= 0) return state;
 
       return {
-        balance: state.balance - energyCost,
-        materials: newMaterials,
+        balance: state.balance + sellQty * material.value,
+        materials: state.materials.map((m) =>
+          m.type === materialType
+            ? { ...m, quantity: m.quantity - sellQty }
+            : m,
+        ),
       };
     });
   },
@@ -200,6 +270,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
               ...mine,
               depth: mine.depth + 10,
               resourcePerSecond: mine.resourcePerSecond * 1.2,
+              maxCapacity: Math.round(mine.maxCapacity * 1.25),
             }
           : mine,
       ),
