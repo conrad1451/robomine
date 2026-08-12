@@ -53,8 +53,72 @@ export interface GameState {
 }
 
 export interface ProcessingRecipe {
-  input: { type: MineType; quantity: number }[];
+  id: MaterialType;
+  label: string;
+  icon: string;
+  /** Ore consumed from a single mine's stockpile to run this recipe once */
+  input: { type: MineType; quantity: number };
   output: { type: MaterialType; quantity: number };
-  processingTime: number;
   energyCost: number;
 }
+
+// CHQ: Claude AI (Sonnet): Base $/unit paid when raw, unprocessed ore is sold directly.
+export const ORE_BASE_VALUE: Record<MineType, number> = {
+  gold: 50,
+  silver: 40,
+  copper: 30,
+  lithium: 30,
+  rare_earth: 30,
+};
+
+// CHQ: Claude AI (Sonnet):
+export const PROCESSING_RECIPES: ProcessingRecipe[] = [
+  {
+    id: "refined_gold",
+    label: "Refined Gold",
+    icon: "🟡",
+    input: { type: "gold", quantity: 10 },
+    output: { type: "refined_gold", quantity: 5 },
+    energyCost: 500,
+  },
+  {
+    id: "refined_silver",
+    label: "Refined Silver",
+    icon: "⚪",
+    input: { type: "silver", quantity: 10 },
+    output: { type: "refined_silver", quantity: 5 },
+    energyCost: 400,
+  },
+  {
+    id: "refined_copper",
+    label: "Refined Copper",
+    icon: "🟠",
+    input: { type: "copper", quantity: 10 },
+    output: { type: "refined_copper", quantity: 5 },
+    energyCost: 300,
+  },
+  {
+    id: "circuits",
+    label: "Circuits",
+    icon: "🔌",
+    input: { type: "rare_earth", quantity: 6 },
+    output: { type: "circuits", quantity: 2 },
+    energyCost: 800,
+  },
+  {
+    id: "batteries",
+    label: "Batteries",
+    icon: "🔋",
+    input: { type: "lithium", quantity: 8 },
+    output: { type: "batteries", quantity: 3 },
+    energyCost: 600,
+  },
+  {
+    id: "construction_steel",
+    label: "Construction Steel",
+    icon: "🏗️",
+    input: { type: "copper", quantity: 15 },
+    output: { type: "construction_steel", quantity: 5 },
+    energyCost: 400,
+  },
+];

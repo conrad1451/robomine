@@ -6,6 +6,7 @@ import { useGameStore } from "../store/gameStore";
 import { useEffect } from "react";
 import { MinePanel } from "./MinePanel";
 import { RobotPanel } from "./RobotPanel";
+import { ProcessingPanel } from "./ProcessingPanel";
 
 export function Dashboard() {
   const { balance, totalMined, collectResources, gameTime } = useGameStore();
@@ -68,7 +69,7 @@ export function Dashboard() {
         <h2 className="text-2xl font-bold text-green-400 mb-4">
           🔧 Material Processing
         </h2>
-        <p className="text-gray-400">Processing system coming soon...</p>
+        <ProcessingPanel />
       </div>
     </div>
   );
