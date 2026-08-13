@@ -9,7 +9,21 @@ import { RobotPanel } from "./RobotPanel";
 import { ProcessingPanel } from "./ProcessingPanel";
 
 export function Dashboard() {
-  const { balance, totalMined, collectResources, gameTime } = useGameStore();
+  // CHQ: Gemini AI: use individual selectors so sub-components
+  // only update when their specific slice of state changes:
+  const balance = useGameStore((state) => state.balance);
+  const totalMined = useGameStore((state) => state.totalMined);
+  const gameTime = useGameStore((state) => state.gameTime);
+  const collectResources = useGameStore((state) => state.collectResources);
+
+  // // CHQ: Gemini AI suggestion (double check): Stable 1-second tick
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     collectResources();
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []); // Empty deps if collectResources reference is stable from Zustand
 
   useEffect(() => {
     const interval = setInterval(() => {
