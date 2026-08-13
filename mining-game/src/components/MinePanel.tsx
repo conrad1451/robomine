@@ -10,11 +10,19 @@ export function MinePanel() {
   const { mines, robots } = useGameStore();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {mines.map((mine) => {
-        return <MineCard mine={mine} robots={robots} />;
-      })}
-    </div>
+    <>
+      <div className="w-full">
+        {/* CHQ: Gemini AI: - grid-cols-2: Default for mobile vertical orientation (2 columns x 3 rows for 6 mines)
+        - landscape:grid-cols-3: Switches to 3 columns x 2 rows when held horizontally
+        - lg:grid-cols-3: (Optional) Keeps 3 columns for desktop/large screens
+      */}
+        <div className="grid grid-cols-2 landscape:grid-cols-3 lg:grid-cols-3 gap-4">
+          {mines.map((mine) => {
+            return <MineCard mine={mine} robots={robots} />;
+          })}
+        </div>
+      </div>
+    </>
   );
 }
 
