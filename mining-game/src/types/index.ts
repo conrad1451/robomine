@@ -132,7 +132,7 @@ export const PROCESSING_RECIPES: ProcessingRecipe[] = [
     id: "construction_steel",
     label: "Construction Steel",
     icon: "🏗️",
-    input: { type: "copper", quantity: 15 },
+    input: { type: "iron", quantity: 15 }, // ← iron instead of copper
     output: { type: "construction_steel", quantity: 5 },
     energyCost: 400,
   },
