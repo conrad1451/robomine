@@ -51,6 +51,7 @@ export function RobotPanel() {
     "copper",
     "lithium",
     "rare_earth",
+    "iron",
   ];
 
   // null = "show all"; otherwise the selected MineType filter

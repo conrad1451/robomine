@@ -2,7 +2,21 @@
 
 // CHQ: Claude AI (Haiku) generated file
 
-export type MineType = "gold" | "silver" | "copper" | "lithium" | "rare_earth";
+// export type MineType = "gold" | "silver" | "copper" | "lithium" | "rare_earth";
+
+// CHQ: Gemini AI made
+export const mineTypes = [
+  "gold",
+  "silver",
+  "copper",
+  "lithium",
+  "rare_earth",
+  "iron",
+] as const;
+
+// CHQ: Gemini AI made
+export type MineType = (typeof mineTypes)[number];
+
 export type MaterialType =
   | "refined_gold"
   | "refined_silver"
@@ -67,6 +81,7 @@ export const ORE_BASE_VALUE: Record<MineType, number> = {
   gold: 50,
   silver: 40,
   copper: 30,
+  iron: 5,
   lithium: 30,
   rare_earth: 30,
 };

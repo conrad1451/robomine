@@ -69,6 +69,17 @@ const MINE_DATA: Record<MineType, Mine> = {
     robotsAssigned: 0,
     maxCapacity: 200,
   },
+  iron: {
+    id: "iron-1",
+    type: "iron",
+    name: "Iron Ore Field",
+    depth: 60,
+    resourcePerSecond: 2.5, // Most abundant material
+    totalExtracted: 0,
+    lifetimeExtracted: 0,
+    robotsAssigned: 0,
+    maxCapacity: 2000,
+  },
 };
 
 const ROBOT_COSTS: Record<RobotType, number> = {
