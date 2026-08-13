@@ -105,12 +105,12 @@ const MAX_ROBOT_LEVEL = 10;
 
 // CHQ: Claude AI (Haiku) extracted material prices into its own Record of constants
 const MATERIAL_VALUES: Record<MaterialType, number> = {
-  refined_gold: 100,
-  refined_silver: 80,
-  refined_copper: 60,
-  circuits: 200,
-  batteries: 150,
-  construction_steel: 120,
+  refined_gold: 450,
+  refined_silver: 75,
+  refined_copper: 12,
+  circuits: 320,
+  batteries: 280,
+  construction_steel: 5,
 };
 
 interface GameStoreState extends GameState {

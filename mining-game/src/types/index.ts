@@ -78,12 +78,12 @@ export interface ProcessingRecipe {
 
 // CHQ: Claude AI (Sonnet): Base $/unit paid when raw, unprocessed ore is sold directly.
 export const ORE_BASE_VALUE: Record<MineType, number> = {
-  gold: 50,
-  silver: 40,
-  copper: 30,
+  gold: 70,
+  silver: 15,
+  copper: 12,
   iron: 5,
-  lithium: 30,
-  rare_earth: 30,
+  lithium: 200,
+  rare_earth: 300,
 };
 
 // CHQ: Claude AI (Sonnet):
