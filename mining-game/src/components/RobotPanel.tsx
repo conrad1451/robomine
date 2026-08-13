@@ -55,7 +55,9 @@ export function RobotPanel() {
   ];
 
   // null = "show all"; otherwise the selected MineType filter
-  const [selectedType, setSelectedType] = useState<MineType | null>(null);
+  const [selectedType, setSelectedType] = useState<MineType | null | "none">(
+    null,
+  );
 
   const visibleRobots = selectedType
     ? robots.filter((robot) => robot.mineType === selectedType)
@@ -95,6 +97,16 @@ export function RobotPanel() {
                 {mineType.replace("_", " ")}
               </button>
             ))}
+            <button
+              onClick={() => setSelectedType("none")}
+              className={`w-full py-2 px-3 rounded text-sm transition ${
+                selectedType === "none"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-slate-700 hover:bg-slate-600"
+              } text-white`}
+            >
+              Collapse All
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -115,11 +127,14 @@ export function RobotPanel() {
             })}
           </div>
 
-          {visibleRobots.length === 0 && (
-            <p className="text-gray-400 mt-2">
-              No robots mining {selectedType?.replace("_", " ")} right now.
-            </p>
-          )}
+          {visibleRobots.length === 0 &&
+            (selectedType === "none" ? (
+              <p className="text-gray-400 mt-2">Robots view collapsed.</p>
+            ) : (
+              <p className="text-gray-400 mt-2">
+                No robots mining {selectedType?.replace("_", " ")} right now.
+              </p>
+            ))}
         </>
       )}
     </div>
