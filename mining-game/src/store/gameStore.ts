@@ -192,6 +192,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         const mine = state.mines.find((m) => m.type === robot.mineType);
         if (!mine) return;
 
+        // Efficiency multiplies extraction SPEED
         const extractAmount = mine.resourcePerSecond * robot.efficiency * 0.1;
         totalMinedDelta += extractAmount;
         gains[mine.type] = (gains[mine.type] ?? 0) + extractAmount;
@@ -203,14 +204,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
         const capacityRemaining = mine.maxCapacity - mine.totalExtracted;
         const stockpiled = Math.min(extracted, Math.max(capacityRemaining, 0));
-        const overflow = extracted - stockpiled;
+        // const overflow = extracted - stockpiled;
 
-        // Ore that doesn't fit in the mine's stockpile is auto-sold on the
-        // spot so idle robots still generate some income, but the player
-        // is incentivized to sell/process before hitting capacity.
-        if (overflow > 0) {
-          newBalance += overflow * ORE_BASE_VALUE[mine.type];
-        }
+        // CHQ: Claude AI (Haiku): All extracted ore (both stockpiled AND overflow) generates income
+        const oreValue = ORE_BASE_VALUE[mine.type];
+        newBalance += extracted * oreValue; // ← FIX: Apply value to ALL extracted ore
 
         return {
           ...mine,
