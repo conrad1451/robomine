@@ -182,7 +182,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   collectResources: () => {
     set((state) => {
-      let newBalance = state.balance;
       let totalMinedDelta = 0;
       const gains: Record<string, number> = {};
 
@@ -194,31 +193,34 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
         // Efficiency multiplies extraction SPEED
         const extractAmount = mine.resourcePerSecond * robot.efficiency * 0.1;
-        totalMinedDelta += extractAmount;
         gains[mine.type] = (gains[mine.type] ?? 0) + extractAmount;
       });
 
+      // CHQ: Claude AI (Sonnet): Ore has no economic value until it's sold
+      // (sellOre) or refined and sold (processResources + sellMaterial).
+      // Extraction itself is capped at each mine's remaining capacity -
+      // once a mine is full, robots working it simply stop pulling out
+      // more until it's sold down.
       const newMines = state.mines.map((mine) => {
-        const extracted = gains[mine.type];
-        if (!extracted) return mine;
+        const gain = gains[mine.type];
+        if (!gain) return mine;
 
-        const capacityRemaining = mine.maxCapacity - mine.totalExtracted;
-        const stockpiled = Math.min(extracted, Math.max(capacityRemaining, 0));
-        // const overflow = extracted - stockpiled;
+        const capacityRemaining = Math.max(
+          mine.maxCapacity - mine.totalExtracted,
+          0,
+        );
+        const extracted = Math.min(gain, capacityRemaining);
 
-        // CHQ: Claude AI (Haiku): All extracted ore (both stockpiled AND overflow) generates income
-        const oreValue = ORE_BASE_VALUE[mine.type];
-        newBalance += extracted * oreValue; // ← FIX: Apply value to ALL extracted ore
+        totalMinedDelta += extracted;
 
         return {
           ...mine,
-          totalExtracted: mine.totalExtracted + stockpiled,
+          totalExtracted: mine.totalExtracted + extracted,
           lifetimeExtracted: mine.lifetimeExtracted + extracted,
         };
       });
 
       return {
-        balance: newBalance,
         totalMined: state.totalMined + totalMinedDelta,
         mines: newMines,
       };
