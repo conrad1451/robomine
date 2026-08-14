@@ -3,7 +3,7 @@
 // CHQ: Claude AI (Haiku) generated file
 
 import { useGameStore } from "../store/gameStore";
-import { useEffect } from "react";
+import { useGameTick } from "../hooks/useGameTick";
 import { MinePanel } from "./MinePanel";
 import { RobotPanel } from "./RobotPanel";
 import { ProcessingPanel } from "./ProcessingPanel";
@@ -14,24 +14,8 @@ export function Dashboard() {
   const balance = useGameStore((state) => state.balance);
   const totalMined = useGameStore((state) => state.totalMined);
   const gameTime = useGameStore((state) => state.gameTime);
-  const collectResources = useGameStore((state) => state.collectResources);
 
-  // // CHQ: Gemini AI suggestion (double check): Stable 1-second tick
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     collectResources();
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []); // Empty deps if collectResources reference is stable from Zustand
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      collectResources();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [collectResources]);
+  useGameTick();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">

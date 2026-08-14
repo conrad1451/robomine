@@ -12,6 +12,7 @@ import type {
   MaterialType,
 } from "../types";
 import { ORE_BASE_VALUE, PROCESSING_RECIPES } from "../types";
+import { computeGameTick, GAME_DURATION_SECONDS } from "./gameTick";
 
 const MINE_DATA: Record<MineType, Mine> = {
   gold: {
@@ -180,51 +181,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }));
   },
 
+  // CHQ: Claude AI (Sonnet) refactoed to call computeGameTick()
   collectResources: () => {
-    set((state) => {
-      let totalMinedDelta = 0;
-      const gains: Record<string, number> = {};
-
-      state.robots.forEach((robot) => {
-        if (!robot.isWorking || !robot.assignedMine) return;
-
-        const mine = state.mines.find((m) => m.type === robot.mineType);
-        if (!mine) return;
-
-        // Efficiency multiplies extraction SPEED
-        const extractAmount = mine.resourcePerSecond * robot.efficiency * 0.1;
-        gains[mine.type] = (gains[mine.type] ?? 0) + extractAmount;
-      });
-
-      // CHQ: Claude AI (Sonnet): Ore has no economic value until it's sold
-      // (sellOre) or refined and sold (processResources + sellMaterial).
-      // Extraction itself is capped at each mine's remaining capacity -
-      // once a mine is full, robots working it simply stop pulling out
-      // more until it's sold down.
-      const newMines = state.mines.map((mine) => {
-        const gain = gains[mine.type];
-        if (!gain) return mine;
-
-        const capacityRemaining = Math.max(
-          mine.maxCapacity - mine.totalExtracted,
-          0,
-        );
-        const extracted = Math.min(gain, capacityRemaining);
-
-        totalMinedDelta += extracted;
-
-        return {
-          ...mine,
-          totalExtracted: mine.totalExtracted + extracted,
-          lifetimeExtracted: mine.lifetimeExtracted + extracted,
-        };
-      });
-
-      return {
-        totalMined: state.totalMined + totalMinedDelta,
-        mines: newMines,
-      };
-    });
+    set((state) => computeGameTick(state));
   },
 
   sellOre: (mineType: MineType) => {
