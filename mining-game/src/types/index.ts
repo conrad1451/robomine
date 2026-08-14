@@ -64,6 +64,7 @@ export interface GameState {
   materials: Material[];
   totalMined: number;
   gameTime: number;
+  isGameOver: boolean;
 }
 
 export interface ProcessingRecipe {

@@ -8,12 +8,22 @@ import { MinePanel } from "./MinePanel";
 import { RobotPanel } from "./RobotPanel";
 import { ProcessingPanel } from "./ProcessingPanel";
 
+// CHQ: Claude AI (Sonnet) made helper function to format game time
+function formatGameTime(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+
+  const seconds = totalSeconds % 60;
+
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 export function Dashboard() {
   // CHQ: Gemini AI: use individual selectors so sub-components
   // only update when their specific slice of state changes:
   const balance = useGameStore((state) => state.balance);
   const totalMined = useGameStore((state) => state.totalMined);
   const gameTime = useGameStore((state) => state.gameTime);
+  const isGameOver = useGameStore((state) => state.isGameOver);
 
   useGameTick();
 
@@ -43,9 +53,19 @@ export function Dashboard() {
             {totalMined.toFixed(0)}
           </p>
         </div>
-        <div className="bg-gradient-to-br from-purple-600 to-purple-800 p-6 rounded-lg border border-purple-400">
-          <p className="text-purple-200 text-sm">⏱️ Game Time</p>
-          <p className="text-3xl font-bold text-white">{gameTime}s</p>
+
+        <div
+          className={`bg-gradient-to-br p-6 rounded-lg border ${
+            isGameOver
+              ? "from-red-700 to-red-900 border-red-400"
+              : "from-purple-600 to-purple-800 border-purple-400"
+          }`}
+        >
+          <p className="text-purple-200 text-sm">⏱️ Time Left</p>
+
+          <p className="text-3xl font-bold text-white">
+            {isGameOver ? "Game Over" : formatGameTime(gameTime)}
+          </p>
         </div>
       </div>
 

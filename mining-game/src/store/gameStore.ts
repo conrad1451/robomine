@@ -144,9 +144,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     quantity: 0,
     value,
   })),
-
   totalMined: 0,
-  gameTime: 0,
+  gameTime: GAME_DURATION_SECONDS, // CHQ: Claude AI set gameTime to start from 30 minutes
+  isGameOver: false, // CHQ: Claude AI added property
 
   addRobot: (type: RobotType, mineName: string) => {
     const cost = ROBOT_COSTS[type];
