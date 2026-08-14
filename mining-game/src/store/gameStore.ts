@@ -1,6 +1,6 @@
 // src/store/gameStore.ts
 
-// CHQ: Claude AI (Haiku) generated file
+// CHQ: Claude AI (Haiku) generated file, heavily edited by me and Claude AI (Sonnet)
 
 import { create } from "zustand";
 import type {
@@ -144,14 +144,16 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     quantity: 0,
     value,
   })),
+
   totalMined: 0,
-  gameTime: GAME_DURATION_SECONDS, // CHQ: Claude AI set gameTime to start from 30 minutes
-  isGameOver: false, // CHQ: Claude AI added property
+  gameTime: GAME_DURATION_SECONDS,
+  isGameOver: false,
 
   addRobot: (type: RobotType, mineName: string) => {
     const cost = ROBOT_COSTS[type];
     const state = get();
 
+    if (state.isGameOver) return;
     if (state.balance < cost) return;
 
     const robot: Robot = {
@@ -181,13 +183,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }));
   },
 
-  // CHQ: Claude AI (Sonnet) refactoed to call computeGameTick()
   collectResources: () => {
     set((state) => computeGameTick(state));
   },
 
   sellOre: (mineType: MineType) => {
     set((state) => {
+      if (state.isGameOver) return state;
+
       const mine = state.mines.find((m) => m.type === mineType);
       if (!mine || mine.totalExtracted <= 0) return state;
 
@@ -259,6 +262,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const upgradeCost = 10000;
     const state = get();
 
+    if (state.isGameOver) return;
     if (state.balance < upgradeCost) return;
 
     set((state) => ({
@@ -279,6 +283,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   // CHQ: Claude AI (Sonnet):
   upgradeRobot: (robotId: string) => {
     set((state) => {
+      if (state.isGameOver) return state;
+
       const robot = state.robots.find((r) => r.id === robotId);
       if (!robot) return state;
       if (robot.level >= MAX_ROBOT_LEVEL) return state;

@@ -1,6 +1,6 @@
 // src/components/RobotPanel.tsx
 
-// CHQ: Claude AI (Haiku) generated file
+// CHQ: Claude AI (Haiku) generated file, heavily edited by me and Claude AI (Sonnet)
 
 import type { Robot, MineType } from "../types";
 
@@ -12,9 +12,10 @@ const RobotInfoTile = (props: {
   balance: number;
   cost: number;
   maxed: boolean;
+  isGameOver: boolean;
   upgradeRobot: (robotId: string) => void;
 }) => {
-  const { robot, balance, cost, maxed, upgradeRobot } = props;
+  const { robot, balance, cost, maxed, isGameOver, upgradeRobot } = props;
   return (
     <div
       key={robot.id}
@@ -33,7 +34,7 @@ const RobotInfoTile = (props: {
       <button
         onClick={() => upgradeRobot(robot.id)}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded text-sm transition disabled:opacity-50"
-        disabled={maxed || balance < cost}
+        disabled={isGameOver || maxed || balance < cost}
       >
         {maxed ? "Max Level" : `Upgrade ($${cost.toLocaleString()})`}
       </button>
@@ -42,14 +43,12 @@ const RobotInfoTile = (props: {
 };
 
 // "all" = show every robot; "collapsed" = show none; otherwise filter to
-
 // robots working the given MineType.
-
 type RobotFilter = "all" | "collapsed" | MineType;
 
 // CHQ: Claude AI (Sonnet) refactored functional component
 export function RobotPanel() {
-  const { robots, balance, upgradeRobot } = useGameStore();
+  const { robots, balance, upgradeRobot, isGameOver } = useGameStore();
 
   const ROBOT_MINE_TYPES: MineType[] = [
     "gold",
@@ -61,11 +60,6 @@ export function RobotPanel() {
   ];
 
   const [filter, setFilter] = useState<RobotFilter>("all");
-
-  // null = "show all"; otherwise the selected MineType filter
-  const [selectedType, setSelectedType] = useState<MineType | null | "none">(
-    null,
-  );
 
   const visibleRobots =
     filter === "all"
@@ -132,6 +126,7 @@ export function RobotPanel() {
                   balance={balance}
                   cost={cost}
                   maxed={maxed}
+                  isGameOver={isGameOver}
                   upgradeRobot={upgradeRobot}
                 />
               );
@@ -139,13 +134,13 @@ export function RobotPanel() {
           </div>
 
           {visibleRobots.length === 0 &&
-            (selectedType === "none" ? (
+            (filter === "collapsed" ? (
               <p className="text-gray-400 mt-2">Robots view collapsed.</p>
-            ) : (
+            ) : filter !== "all" ? (
               <p className="text-gray-400 mt-2">
-                No robots mining {selectedType?.replace("_", " ")} right now.
+                No robots mining {filter.replace("_", " ")} right now.
               </p>
-            ))}
+            ) : null)}
         </>
       )}
     </div>

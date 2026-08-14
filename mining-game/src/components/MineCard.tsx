@@ -1,6 +1,6 @@
-// src/components/MinePanel.tsx
+// src/components/MineCard.tsx
 
-// CHQ: Claude AI (Haiku) generated file
+// CHQ: Claude AI (Haiku) generated file, heavily edited by me and Claude AI (Sonnet)
 
 import type { Mine, Robot } from "../types";
 import { useGameStore } from "../store/gameStore";
@@ -8,7 +8,8 @@ import { useGameStore } from "../store/gameStore";
 export const MineCard = (props: { mine: Mine; robots: Robot[] }) => {
   const { mine, robots } = props;
 
-  const { addRobot, balance, sellOre, upgradeMine } = useGameStore();
+  const { addRobot, balance, sellOre, upgradeMine, isGameOver } =
+    useGameStore();
 
   const isFull = mine.totalExtracted >= mine.maxCapacity;
 
@@ -77,7 +78,7 @@ export const MineCard = (props: { mine: Mine; robots: Robot[] }) => {
             if (balance >= 5000) addRobot("basic", mine.type);
           }}
           className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded text-sm transition disabled:opacity-50"
-          disabled={balance < 5000}
+          disabled={isGameOver || balance < 5000}
         >
           Add Bot ($5K)
         </button>
@@ -86,7 +87,7 @@ export const MineCard = (props: { mine: Mine; robots: Robot[] }) => {
             if (balance >= 10000) upgradeMine(mine.type);
           }}
           className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 rounded text-sm transition disabled:opacity-50"
-          disabled={balance < 10000}
+          disabled={isGameOver || balance < 10000}
         >
           Upgrade ($10K)
         </button>
@@ -95,7 +96,7 @@ export const MineCard = (props: { mine: Mine; robots: Robot[] }) => {
       <button
         onClick={() => sellOre(mine.type)}
         className="w-full bg-slate-600 hover:bg-slate-500 text-white py-2 px-3 rounded text-sm transition disabled:opacity-50"
-        disabled={mine.totalExtracted <= 0}
+        disabled={isGameOver || mine.totalExtracted <= 0}
       >
         Sell Ore ({mine.totalExtracted.toFixed(0)} units)
       </button>
