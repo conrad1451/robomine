@@ -41,6 +41,12 @@ const RobotInfoTile = (props: {
   );
 };
 
+// "all" = show every robot; "collapsed" = show none; otherwise filter to
+
+// robots working the given MineType.
+
+type RobotFilter = "all" | "collapsed" | MineType;
+
 // CHQ: Claude AI (Sonnet) refactored functional component
 export function RobotPanel() {
   const { robots, balance, upgradeRobot } = useGameStore();
@@ -54,14 +60,19 @@ export function RobotPanel() {
     "iron",
   ];
 
+  const [filter, setFilter] = useState<RobotFilter>("all");
+
   // null = "show all"; otherwise the selected MineType filter
   const [selectedType, setSelectedType] = useState<MineType | null | "none">(
     null,
   );
 
-  const visibleRobots = selectedType
-    ? robots.filter((robot) => robot.mineType === selectedType)
-    : robots;
+  const visibleRobots =
+    filter === "all"
+      ? robots
+      : filter === "collapsed"
+        ? []
+        : robots.filter((robot) => robot.mineType === filter);
 
   return (
     <div className="bg-slate-800 rounded-lg p-6 border border-blue-500/30">
@@ -75,9 +86,9 @@ export function RobotPanel() {
         <>
           <div className="grid grid-cols-3 gap-2 mb-4">
             <button
-              onClick={() => setSelectedType(null)}
+              onClick={() => setFilter("all")}
               className={`w-full py-2 px-3 rounded text-sm transition ${
-                selectedType === null
+                filter === "all"
                   ? "bg-purple-600 hover:bg-purple-700"
                   : "bg-slate-700 hover:bg-slate-600"
               } text-white`}
@@ -87,9 +98,9 @@ export function RobotPanel() {
             {ROBOT_MINE_TYPES.map((mineType) => (
               <button
                 key={mineType}
-                onClick={() => setSelectedType(mineType)}
+                onClick={() => setFilter(mineType)}
                 className={`w-full py-2 px-3 rounded text-sm transition capitalize ${
-                  selectedType === mineType
+                  filter === mineType
                     ? "bg-purple-600 hover:bg-purple-700"
                     : "bg-slate-700 hover:bg-slate-600"
                 } text-white`}
@@ -98,9 +109,9 @@ export function RobotPanel() {
               </button>
             ))}
             <button
-              onClick={() => setSelectedType("none")}
+              onClick={() => setFilter("collapsed")}
               className={`w-full py-2 px-3 rounded text-sm transition ${
-                selectedType === "none"
+                filter === "collapsed"
                   ? "bg-purple-600 hover:bg-purple-700"
                   : "bg-slate-700 hover:bg-slate-600"
               } text-white`}
