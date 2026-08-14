@@ -18,7 +18,7 @@ export function MinePanel() {
       */}
         <div className="grid grid-cols-2 landscape:grid-cols-3 lg:grid-cols-3 gap-4">
           {mines.map((mine) => {
-            return <MineCard mine={mine} robots={robots} />;
+            return <MineCard key={mine.id} mine={mine} robots={robots} />;
           })}
         </div>
       </div>
