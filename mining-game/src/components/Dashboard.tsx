@@ -1,11 +1,6 @@
 // src/components/Dashboard.tsx
 
-// CHQ: Claude AI (Haiku) generated file
-
-import { useState } from "react";
-// import { useSession, useUser, useDescope } from "@descope/react-sdk";
-import Dialog from "@mui/material/Dialog";
-import IconButton from "@mui/material/IconButton";
+// CHQ: Claude AI (Haiku) create and I edited heavily with assistance from Claude AI (Sonnet)
 
 import { useGameStore } from "../store/gameStore";
 import { useGameTick } from "../hooks/useGameTick";
@@ -27,9 +22,6 @@ export function Dashboard() {
   // const { isAuthenticated, isSessionLoading } = useSession();
   // const { user } = useUser();
   // const { logout } = useDescope();
-
-  // Modal State
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   // Zustand Game Store
   const balance = useGameStore((state) => state.balance);
@@ -118,21 +110,22 @@ export function Dashboard() {
           <p className="text-3xl font-bold text-white">
             {isGameOver ? "Game Over" : formatGameTime(gameTime)}
           </p>
-          <p className="text-3xl font-bold text-white">
-            {isGameOver &&
-              (isAuthenticated ? (
+          {isGameOver && (
+            <div className="mt-3">
+              {isAuthenticated ? (
                 <button
                   onClick={handleSaveScore}
-                  className="mt-3 w-full bg-white/10 hover:bg-white/20 text-white py-1.5 px-3 rounded text-sm transition"
+                  className="w-full bg-white/10 hover:bg-white/20 text-white py-1.5 px-3 rounded text-sm transition"
                 >
                   Save Score
                 </button>
               ) : (
-                <p className="mt-3 text-xs text-red-200">
+                <p className="text-xs text-red-200">
                   Log in above to save your score.
                 </p>
-              ))}
-          </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -155,31 +148,6 @@ export function Dashboard() {
         </h2>
         <ProcessingPanel />
       </div>
-
-      {/* Descope Auth Modal Popup */}
-      <Dialog
-        open={isAuthOpen && !isAuthenticated}
-        onClose={() => setIsAuthOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          style: {
-            backgroundColor: "#1e293b",
-            color: "#ffffff",
-            borderRadius: "12px",
-            padding: "8px",
-          },
-        }}
-      >
-        <div className="flex justify-end">
-          <IconButton
-            onClick={() => setIsAuthOpen(false)}
-            sx={{ color: "#94a3b8" }}
-          >
-            ✕
-          </IconButton>
-        </div>
-      </Dialog>
     </div>
   );
 }
