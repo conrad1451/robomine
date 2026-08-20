@@ -5,7 +5,9 @@
 // import viteLogo from "./assets/vite.svg";
 // import heroImg from "./assets/hero.png";
 
-import { Dashboard } from "./components/Dashboard";
+// import { Dashboard } from "./components/Dashboard";
+import { AuthProvider } from "@descope/react-sdk";
+import FirstApp from "./auth/FirstApp";
 
 import "./App.css";
 
@@ -125,7 +127,18 @@ import "./App.css";
 // }
 
 function App() {
-  return <Dashboard />;
+  // return <Dashboard />;
+  // return <FirstApp />;
+
+  const projectId = import.meta.env.VITE_DESCOPE_PROJECT_ID;
+
+  return (
+    <div>
+      <AuthProvider projectId={projectId}>
+        <FirstApp />
+      </AuthProvider>
+    </div>
+  );
 }
 
 export default App;

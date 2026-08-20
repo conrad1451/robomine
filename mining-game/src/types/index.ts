@@ -1,6 +1,6 @@
 // src/types/index.ts
 
-// CHQ: Claude AI (Haiku) generated file
+// CHQ: Claude AI (Haiku) created, Claude AI (Sonnet) edited
 
 // export type MineType = "gold" | "silver" | "copper" | "lithium" | "rare_earth";
 
@@ -63,8 +63,11 @@ export interface GameState {
   mines: Mine[];
   materials: Material[];
   totalMined: number;
+  /** Seconds remaining in the match, counting down from GAME_DURATION_SECONDS to 0 */
   gameTime: number;
   isGameOver: boolean;
+  /** True once the player has clicked "Start" — the countdown only ticks while this is true */
+  hasStarted: boolean; // CHQ: Claude AI (Sonnet) added
 }
 
 export interface ProcessingRecipe {

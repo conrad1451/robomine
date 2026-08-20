@@ -13,14 +13,15 @@ import { useGameStore } from "../store/gameStore";
 export function useGameTick() {
   const collectResources = useGameStore((state) => state.collectResources);
   const isGameOver = useGameStore((state) => state.isGameOver);
+  const hasStarted = useGameStore((state) => state.hasStarted);
 
   useEffect(() => {
-    if (isGameOver) return;
+    if (!hasStarted || isGameOver) return;
 
     const interval = setInterval(() => {
       collectResources();
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [collectResources, isGameOver]);
+  }, [collectResources, isGameOver, hasStarted]);
 }

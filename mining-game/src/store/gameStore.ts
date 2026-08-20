@@ -125,6 +125,7 @@ interface GameStoreState extends GameState {
   upgradeRobot: (robotId: string) => void;
   addBalance: (amount: number) => void;
   deductBalance: (amount: number) => boolean;
+  startGame: () => void;
 }
 
 // CHQ: Claude AI (Sonnet):
@@ -148,6 +149,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   totalMined: 0,
   gameTime: GAME_DURATION_SECONDS,
   isGameOver: false,
+  hasStarted: false,
 
   addRobot: (type: RobotType, mineName: string) => {
     const cost = ROBOT_COSTS[type];
@@ -322,5 +324,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return true;
     }
     return false;
+  },
+  // CHQ: Claude AI (Sonnet) added
+  startGame: () => {
+    const state = get();
+
+    if (state.hasStarted) return;
+
+    set({ hasStarted: true });
   },
 }));
