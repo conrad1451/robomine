@@ -2,8 +2,10 @@
 
 // CHQ: Claude AI (Haiku) create and I edited heavily with assistance from Claude AI (Sonnet)
 
+import { useEffect } from "react";
 import { useGameStore } from "../store/gameStore";
 import { useGameTick } from "../hooks/useGameTick";
+import { useSyncAuthToken } from "../hooks/useSyncAuthToken";
 import { MinePanel } from "./MinePanel";
 import { RobotPanel } from "./RobotPanel";
 import { ProcessingPanel } from "./ProcessingPanel";
@@ -30,21 +32,22 @@ export function Dashboard() {
   const isGameOver = useGameStore((state) => state.isGameOver);
   const hasStarted = useGameStore((state) => state.hasStarted);
   const startGame = useGameStore((state) => state.startGame);
-  const { isAuthenticated } = useSession();
+  const hydrate = useGameStore((state) => state.hydrate);
+  const isSyncing = useGameStore((state) => state.isSyncing);
+  const syncError = useGameStore((state) => state.error);
+  const { isAuthenticated, isSessionLoading } = useSession();
 
   useGameTick();
+  useSyncAuthToken();
 
-  // Placeholder until a real backend/storage layer is picked — for now this
-
-  // just confirms the login → save flow is wired up end to end.
-
-  function handleSaveScore() {
-    console.log("Saving score (stub):", { balance, totalMined });
-
-    alert(
-      `Score saved (placeholder)!\nBalance: $${balance.toLocaleString()}\nTotal Mined: ${totalMined.toFixed(0)}`,
-    );
-  }
+  // Pull the authoritative game state from the server as soon as we know
+  // who's logged in - every action after this stays in sync with it, so
+  // there's no separate "save" step needed at game over.
+  useEffect(() => {
+    if (!isSessionLoading && isAuthenticated) {
+      hydrate();
+    }
+  }, [isSessionLoading, isAuthenticated, hydrate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">
@@ -81,7 +84,15 @@ export function Dashboard() {
           </p>
         </div>
 
-        <AuthButton />
+        <div className="flex flex-col items-end gap-1">
+          <AuthButton />
+          {isSyncing && <span className="text-xs text-gray-400">Syncing…</span>}
+          {!isSyncing && syncError && (
+            <span className="text-xs text-red-400 max-w-xs text-right">
+              ⚠️ {syncError}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Stats Bar */}
@@ -113,12 +124,10 @@ export function Dashboard() {
           {isGameOver && (
             <div className="mt-3">
               {isAuthenticated ? (
-                <button
-                  onClick={handleSaveScore}
-                  className="w-full bg-white/10 hover:bg-white/20 text-white py-1.5 px-3 rounded text-sm transition"
-                >
-                  Save Score
-                </button>
+                <p className="text-xs text-purple-200">
+                  ✅ Your score is saved automatically — every action synced
+                  live during the match.
+                </p>
               ) : (
                 <p className="text-xs text-red-200">
                   Log in above to save your score.
