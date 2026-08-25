@@ -1,2 +1,9 @@
 # robomine
+
 A game where users control robots to mine for metals and process the raw material into the foundations of an empire!
+
+The app itself lives in [`mining-game/`](./mining-game) — see that folder's README for setup instructions, tech stack, and how the game works.
+
+## License
+
+See [LICENSE](./LICENSE).
