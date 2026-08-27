@@ -14,7 +14,9 @@
 // from a hook wired to useSession().sessionToken, which is the
 // context-backed value guaranteed to match the real, mounted provider.
 
-const API_BASE_URL = import.meta.env.VITE_API_URL as string | undefined;
+const rawUrl = import.meta.env.VITE_API_URL as string | undefined;
+// Remove trailing slashes if present
+const API_BASE_URL = rawUrl ? rawUrl.replace(/\/+$/, "") : undefined;
 
 let currentToken: string | null = null;
 
@@ -42,7 +44,7 @@ export class NetworkError extends Error {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_BASE_URL) {
-    throw new Error("VITE_API_URL is not set - point it at the backend ");
+    throw new Error("VITE_API_URL is not set - point it at the backend");
   }
 
   let response: Response;
@@ -67,9 +69,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(response.status, text || response.statusText);
   }
 
-  // Some endpoints (rare) may return no body.
   const text = await response.text();
-  return (text ? JSON.parse(text) : undefined) as T;
+  // Some endpoints (rare) may return no body.
+  if (!text) {
+    return undefined as T;
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError(
+      response.status,
+      `Server returned invalid JSON response: ${text.substring(0, 100)}`,
+    );
+  }
 }
 
 export const api = {
