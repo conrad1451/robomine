@@ -1,4 +1,5 @@
 // FirstApp.tsx
+import { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,6 +8,8 @@ import {
 } from "react-router-dom";
 import { Dashboard } from "../components/Dashboard";
 import GameLeaderboard from "../components/Leaderboard";
+import { PlayTypeModal } from "../components/PlayTypeModal";
+
 // import "./App.css";
 import { Box, Button, Typography } from "@mui/material";
 
@@ -15,11 +18,28 @@ export interface NavigationButtonsProps {
 }
 
 const NavigationButtons: React.FC<NavigationButtonsProps> = ({ navigate }) => {
+  const [showOptions, setShowOptions] = useState(false);
+
   return (
     <Box sx={{ display: "flex", gap: 2, justifyContent: "center", p: 4 }}>
-      <Button variant="contained" onClick={() => navigate("/countdowndiggame")}>
+      {/* <Button variant="contained" onClick={() => navigate("/countdowndiggame")}>
         Dig against the clock
-      </Button>
+      </Button> */}
+
+      <>
+        <Button variant="contained" onClick={() => setShowOptions(true)}>
+          Dig against the clock
+        </Button>
+        {showOptions && (
+          <PlayTypeModal
+            onClose={() => setShowOptions(false)}
+            leaderboardGame={() => navigate("/countdowndiggame")}
+            offlineGame={() => navigate("/countdowndiggame")}
+          />
+        )}
+
+        {/* {showOptions && <PlayTypeModal onClose={() => setShowOptions(false)} />} */}
+      </>
       <Button
         variant="contained"
         color="success"
