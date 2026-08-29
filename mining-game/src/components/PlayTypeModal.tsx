@@ -1,5 +1,5 @@
 // src/components/PlayTypeModal.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "@descope/react-sdk";
 import { Box } from "@mui/material";
 import { LoginModal } from "../auth/LoginModal";
@@ -41,7 +41,7 @@ export function PlayTypeModal(props: {
   offlineGame: () => void;
 }) {
   const { onClose, offlineGame, leaderboardGame } = props;
-  const { isAuthenticated, isSessionLoading } = useSession();
+  const { isAuthenticated } = useSession();
 
   // CHQ: Claude AI (Sonnet): Switching between "select"
   // and "login" modes prevents nested modal clutter and
@@ -60,24 +60,20 @@ export function PlayTypeModal(props: {
     }
   };
 
-  // CHQ: Claude AI (Sonnet): Declarative Auth Tracking:
-  // Using useEffect to watch isAuthenticated state
-  // changes handles successful logins reliably without
-  // relying on direct callbacks from LoginModal.
-
-  // LoginModal's onSuccess just calls onClose but doesn't tell us *why*
-  // it closed (cancel vs. successful sign-in). So we watch isAuthenticated
-  // ourselves: if it flips true while we're waiting on login, proceed.
-  useEffect(() => {
-    if (mode === "login" && !isSessionLoading && isAuthenticated) {
-      leaderboardGame();
-    }
-  }, [mode, isSessionLoading, isAuthenticated, leaderboardGame]);
-
   if (mode === "login") {
     // LoginModal is its own full-screen overlay so render it directly rather
     // than nesting it inside PlayTypeModal's backdrop below.
-    return <LoginModal onClose={() => setMode("select")} />;
+    //
+    // onClose (cancel/backdrop click) just returns to the select screen.
+    // onSuccess (Descope reported a successful sign-in) goes straight into
+    // the leaderboard game instead of bouncing back through "select", which
+    // used to race against the isAuthenticated flag and require extra clicks.
+    return (
+      <LoginModal
+        onClose={() => setMode("select")}
+        onSuccess={leaderboardGame}
+      />
+    );
   }
 
   return (
