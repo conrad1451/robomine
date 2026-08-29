@@ -4,8 +4,8 @@
 
 import { Descope } from "@descope/react-sdk";
 
-export function LoginModal(props: { onClose: () => void }) {
-  const { onClose } = props;
+export function LoginModal(props: { onClose: () => void; onSuccess: () => void }) {
+  const { onClose, onSuccess } = props;
 
   return (
     <div
@@ -35,7 +35,7 @@ export function LoginModal(props: { onClose: () => void }) {
         */}
         <Descope
           flowId="sign-up-or-in"
-          onSuccess={onClose}
+          onSuccess={onSuccess}
           onError={(err) => console.error("Descope auth error:", err)}
         />
       </div>
