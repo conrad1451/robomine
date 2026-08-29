@@ -42,7 +42,12 @@ export function AuthButton() {
       >
         Log In to Save Scores
       </button>
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+      {showLogin && (
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onSuccess={() => setShowLogin(false)}
+        />
+      )}
     </>
   );
 }
