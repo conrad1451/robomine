@@ -6,6 +6,8 @@ import { useSession, useUser, useDescope } from "@descope/react-sdk";
 import { useState } from "react";
 import { LoginModal } from "./LoginModal";
 
+import { useGameStore } from "../store/gameStore"
+
 export function AuthButton() {
   const { isAuthenticated, isSessionLoading } = useSession();
   const { user } = useUser();
