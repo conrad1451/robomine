@@ -200,4 +200,11 @@ export const gameApi = {
 
   getScores: (gameMode: string) =>
     api.get<ScoreDto[]>(`/api/scores/game/${gameMode}`),
+
+  resetGame: (
+    previous: Pick<GameState, "gameTime" | "isGameOver" | "hasStarted">,
+  ) =>
+    api
+      .post<GameStateDto>("/api/player/reset")
+      .then((dto) => toFrontendState(dto, previous)),
 };

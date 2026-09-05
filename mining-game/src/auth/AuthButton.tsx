@@ -11,7 +11,10 @@ export function AuthButton() {
   const { user } = useUser();
   const { logout } = useDescope();
   const [showLogin, setShowLogin] = useState(false);
-
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const resetGame = useGameStore((state) => state.resetGame);
+  const isSyncing = useGameStore((state) => state.isSyncing);
+  
   if (isSessionLoading) {
     return (
       <div className="text-sm text-gray-400 px-3 py-2">Checking login…</div>
@@ -24,6 +27,36 @@ export function AuthButton() {
         <span className="text-sm text-gray-300">
           {user?.name || user?.email || "Logged in"}
         </span>
+
+        {confirmingReset ? (
+          <>
+            <span className="text-sm text-red-300">Reset progress?</span>
+            <button
+              onClick={async () => {
+                await resetGame();
+                setConfirmingReset(false);
+              }}
+              disabled={isSyncing}
+              className="bg-red-600 hover:bg-red-700 text-white py-1.5 px-3 rounded text-sm transition disabled:opacity-50"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={() => setConfirmingReset(false)}
+              className="bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-3 rounded text-sm transition"
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setConfirmingReset(true)}
+            className="bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-3 rounded text-sm transition"
+          >
+            Reset Game
+          </button>
+        )}
+
         <button
           onClick={() => logout()}
           className="bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-3 rounded text-sm transition"

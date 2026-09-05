@@ -154,6 +154,7 @@ interface GameStoreState extends GameState {
   // Pulls the authoritative state from the server - call on login and
   // whenever the app regains focus/connectivity.
   hydrate: () => Promise<void>;
+  resetGame: () => Promise<void>; // CHQ: added by Claude AI
 }
 
 export function robotUpgradeCost(robot: Robot): number {
@@ -459,5 +460,20 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const state = get();
     if (state.hasStarted) return;
     set({ hasStarted: true });
+  },
+
+  // CHQ: Claude AI (Sonnet) made reset action
+  resetGame: async () => {
+    set({ isSyncing: true });
+    try {
+      const fresh = await gameApi.resetGame({
+        gameTime: GAME_DURATION_SECONDS,
+        isGameOver: false,
+        hasStarted: false,
+      });
+      set({ ...fresh, isSyncing: false, error: null });
+    } catch (err) {
+      set({ isSyncing: false, error: describeError(err) });
+    }
   },
 }));
