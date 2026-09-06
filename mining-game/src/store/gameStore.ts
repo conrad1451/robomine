@@ -200,7 +200,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         isGameOver: state.isGameOver,
         hasStarted: state.hasStarted,
       });
-      set({ ...fresh, isSyncing: false, error: null });
+      // set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       set({ isSyncing: false, error: describeError(err) });
     }
@@ -231,7 +239,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.buyRobot(type, mineName, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       set({
         robots: snapshot.robots,
@@ -256,7 +271,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.assignRobot(robotId, mineName, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
+
     } catch (err) {
       set({
         robots: snapshot.robots,
@@ -276,7 +299,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.getState(state);
-      set({ ...fresh, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        // isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       // Silent on failure - this runs on a timer, not from a user click, so
       // we don't want to spam the error banner every few seconds while
@@ -305,7 +335,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.sellOre(mineType, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       set({
         balance: snapshot.balance,
@@ -342,7 +379,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.processRecipe(recipeId, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
+
     } catch (err) {
       set({
         balance: snapshot.balance,
@@ -376,7 +421,15 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         quantity,
         snapshot,
       );
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
+
     } catch (err) {
       set({
         balance: snapshot.balance,
@@ -408,7 +461,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.upgradeMine(mineName, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       set({
         mines: snapshot.mines,
@@ -445,7 +505,14 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     try {
       const fresh = await gameApi.upgradeRobot(robotId, snapshot);
-      set({ ...fresh, isSyncing: false, error: null });
+      set((state) => ({
+        ...fresh,
+        gameTime: state.gameTime,
+        isGameOver: state.isGameOver,
+        hasStarted: state.hasStarted,
+        isSyncing: false,
+        error: null,
+      }));
     } catch (err) {
       set({
         balance: snapshot.balance,
