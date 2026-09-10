@@ -8,6 +8,11 @@ import {
 } from "react-router-dom";
 import { Dashboard } from "../components/Dashboard";
 import GameLeaderboard from "../components/Leaderboard";
+
+import PrivacyPolicy from "../components/PrivacyPolicy"
+import TermsOfUse from "../components/TermsOfUse";
+import Disclaimer from "../components/Disclaimer";
+
 import { PlayTypeModal } from "../components/PlayTypeModal";
 
 // import "./App.css";
@@ -47,6 +52,18 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ navigate }) => {
       >
         View Leaderboard
       </Button>
+      <>
+        <div id="ta-ad-container" style={{ minHeight: "100px" }} />
+        <div className="footer">
+          <Button onClick={() => navigate("/terms")}>Terms of Use</Button>
+          <Button onClick={() => navigate("/privacy")}>
+            Privacy Policy
+            </Button>
+          <Button onClick={() => navigate("/disclaimer")}>
+            Disclaimer
+          </Button>
+        </div>
+      </>
     </Box>
   );
 };
@@ -70,6 +87,9 @@ const FirstApp = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/countdowndiggame" element={<Dashboard />} />
         <Route path="/leaderboard" element={<GameLeaderboard />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
       </Routes>
     </Router>
   );
